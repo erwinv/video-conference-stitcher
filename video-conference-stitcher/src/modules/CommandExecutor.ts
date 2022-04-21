@@ -19,10 +19,6 @@ export default {
 
       ls.stderr.on('data', (data) => {
         if (log) console.log(`stderr: ${data}`)
-      })
-
-      ls.on('error', (error) => {
-        if (log) console.log(`error: ${error.message}`)
         reject()
       })
 
@@ -57,7 +53,6 @@ export default {
       const process = spawn(command, [], { shell: true })
 
       const stream = new Readable()
-      // tslint:disable-next-line:no-empty
       stream._read = _.noop
       stream.push(value)
       stream.push(null)

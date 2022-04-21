@@ -33,7 +33,7 @@ export default class Media {
     this.startTime = startTime
   }
 
-  init(): PromiseLike<any> {
+  init() {
     // TODO not looking for stream channels if doesn't contain audio.
     // Would it work with just audio files?
     return new Promise<void>((resolve, reject) => {
@@ -47,7 +47,7 @@ export default class Media {
           this.initialized = true
           resolve()
         })
-        .catch((err: any) => {
+        .catch((err) => {
           console.error('error loading video file at ', this.path, err)
           reject(err)
         })

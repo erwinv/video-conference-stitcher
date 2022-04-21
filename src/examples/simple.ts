@@ -1,8 +1,15 @@
 import path from 'path'
-import { User, Layouts, Sequence, Media } from '../index'
+import {
+  User,
+  Layouts,
+  Sequence,
+  Media,
+  EncodingOptions,
+  VideoLayout,
+} from '../index'
 const { PresenterLayout, GridLayout, MosaicLayout } = Layouts
 
-function basicEncode(encode: boolean = true) {
+function basicEncode(encode = true) {
   // GET LIST OF MEDIA PER USER
   const videoFolder = path.join(__dirname, '../../videos')
 

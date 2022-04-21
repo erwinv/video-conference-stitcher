@@ -1,4 +1,5 @@
 import Media from './Media'
+import { Size, VideoLayout, VideoBox } from '../types/Types'
 
 export default class SequenceStep {
   public readonly id: string
@@ -79,7 +80,7 @@ export default class SequenceStep {
     })
 
     // ---------------- OVERLAY VIDEOS ----------------------- //
-    let prevVideoId: number = -1
+    let prevVideoId = -1
     videoList.forEach((vid, ind) => {
       const box = boxes[ind]
       let keyOut: string
@@ -123,9 +124,9 @@ export default class SequenceStep {
       .map((vid) => `[${this.id}_${vid.id}_a]`)
       .join('')
 
-    let c0: string = ''
-    let c1: string = ''
-    let currentIndex: number = 0
+    let c0 = ''
+    let c1 = ''
+    let currentIndex = 0
     audioList.forEach((vid, ind) => {
       const plus: string = ind === audioList.length - 1 ? '' : '+'
       if (vid.audioChannels === 6) {

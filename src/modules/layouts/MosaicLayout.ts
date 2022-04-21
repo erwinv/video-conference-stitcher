@@ -1,3 +1,5 @@
+import { VideoLayout, VideoBox, Size } from '../../types/Types'
+
 export default class MosaicLayout implements VideoLayout {
   getBoxes(n: number, size: Size): VideoBox[] {
     const list: number[] = [1]

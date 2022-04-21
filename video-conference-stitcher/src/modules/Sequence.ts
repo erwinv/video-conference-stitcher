@@ -2,6 +2,7 @@ import Media from './Media'
 import SequenceStep from './SequenceStep'
 import CommandExecutor from './CommandExecutor'
 import User from './User'
+import { VideoLayout, EncodingOptions } from '../types/Types'
 
 export default class Sequence {
   public mediaList: Media[]
@@ -102,12 +103,11 @@ export default class Sequence {
 
         // building sequences
 
-        let prevTime: number = -1
+        let prevTime = -1
         const currentVideos: Media[] = []
         this.sequenceSteps = []
         while (queue.length > 0) {
-          // @ts-ignore
-          const point: MediaPoint = queue.pop()
+          const point = queue.pop() as MediaPoint
           if (
             (queue.length === 0 || point.time !== prevTime) &&
             prevTime !== -1 &&

@@ -7,10 +7,10 @@ export default class Media {
   public readonly hasVideo: boolean
   public readonly startTime: number
   public user: User | null = null
-  public id: number = -1
-  public duration: number = -1
-  public audioChannels: number = -1
-  public initialized: boolean = false
+  public id = -1
+  public duration = -1
+  public audioChannels = -1
+  public initialized = false
 
   /**
    *
@@ -57,7 +57,7 @@ export default class Media {
   /**
    * @return time in milliseconds
    */
-  async getEntry(entry: string, log: boolean = false): Promise<string> {
+  async getEntry(entry: string, log = false): Promise<string> {
     return new Promise((resolve, reject) => {
       const command = `ffprobe -v error -show_entries ${entry} -of default=noprint_wrappers=1:nokey=1 "${this.path}"`
       const ls = spawn(command, [], { shell: true })

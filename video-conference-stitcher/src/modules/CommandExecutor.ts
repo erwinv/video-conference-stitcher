@@ -1,8 +1,9 @@
+import _ from 'lodash'
 import { spawn } from 'child_process'
 import { Readable } from 'stream'
 
 export default {
-  execute(command: string, log: boolean = false): Promise<void> {
+  execute(command: string, log = false): Promise<void> {
     return new Promise<void>(function (resolve, reject) {
       if (log)
         console.log(
@@ -39,7 +40,7 @@ export default {
    *        command the value will be piped to
    * @param log
    */
-  pipeExec(value: string, command: string, log: boolean = false) {
+  pipeExec(value: string, command: string, log = false) {
     return new Promise<void>(function (resolve, reject) {
       // Pretty printing the command in the terminal
       if (log)
@@ -57,7 +58,7 @@ export default {
 
       const stream = new Readable()
       // tslint:disable-next-line:no-empty
-      stream._read = () => {}
+      stream._read = _.noop
       stream.push(value)
       stream.push(null)
       stream.resume()

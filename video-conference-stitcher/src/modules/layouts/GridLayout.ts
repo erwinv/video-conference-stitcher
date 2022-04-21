@@ -1,3 +1,5 @@
+import { VideoLayout, VideoBox, Size } from '../../types/Types'
+
 export default class GridLayout implements VideoLayout {
   getBoxes(n: number, size: Size): VideoBox[] {
     const side: number = n <= 9 ? 3 : Math.ceil(Math.sqrt(n))

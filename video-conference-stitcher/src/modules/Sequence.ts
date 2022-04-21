@@ -22,13 +22,13 @@ export default class Sequence {
     })
 
     const defaultEncodingOptions: EncodingOptions = {
-      size: { w: 1280, h: 720 },
-      crf: 22,
+      size: { w: 1920, h: 1080 },
+      bitrate: '1800k',
     }
     if (encOpt && encOpt.crf && encOpt.bitrate)
       throw new Error('cannot use bitrate and crf simultaneously')
     const encoding: EncodingOptions = {
-      size: encOpt ? encOpt.size : defaultEncodingOptions.size,
+      size: encOpt?.size ?? defaultEncodingOptions.size,
       loglevel: encOpt?.loglevel,
     }
     if (!encOpt?.crf && !encOpt?.bitrate) {
@@ -50,12 +50,11 @@ export default class Sequence {
 
   async encode() {
     console.log('start encoding')
-    return this.generateCommand().then(([filter, command]) => {
-      return CommandExecutor.pipeExec(filter, command, true)
-    })
+    const [filter, command] = await this.generateCommand()
+    return CommandExecutor.pipeExec(filter, command, true)
   }
 
-  private createSequenceSteps() {
+  private async createSequenceSteps() {
     // check videos
     return this.mediaList
       .reduce(async (p: Promise<void>, med: Media) => {
@@ -168,7 +167,7 @@ export default class Sequence {
       })
   }
 
-  async generateCommand(): Promise<string[]> {
+  async generateCommand() {
     await this.createSequenceSteps()
 
     const command: string[] = []
@@ -183,11 +182,15 @@ export default class Sequence {
     )
     command.push(`-filter_complex_script `)
     command.push('pipe:0 ')
-    const quality: string = this.encodingOptions.crf
-      ? `-crf ${this.encodingOptions.crf}`
-      : `-b:v ${this.encodingOptions.bitrate}`
+
+    // https://developers.google.com/media/vp9/settings/vod#recommended_settings
+    // 1080p@30
+    const quality = `-b:v 1800k -minrate 900k -maxrate 2610k`
+    // 720p@30
+    // const quality = `-b:v 1024k -minrate 512k -maxrate 1485k`
+
     command.push(
-      `-c:v libx264 ${quality} -preset fast -map [vid] -map [aud] -y "${this.outputVideo.path}"`
+      `-c:a libopus -b:a 128k -c:v libvpx-vp9 ${quality} -map [aud] -map [vid] -r 30 -y "${this.outputVideo.path}"`
     )
 
     const filter: string[] = []
@@ -200,6 +203,6 @@ export default class Sequence {
         .join('')}concat=n=${this.sequenceSteps.length}:v=1:a=1[vid][aud]`
     )
 
-    return Promise.all([filter.join(''), command.join('')])
+    return [filter.join(''), command.join('')]
   }
 }

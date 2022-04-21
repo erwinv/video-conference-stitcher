@@ -1,0 +1,42 @@
+{
+  "name": "video-conference-stitcher",
+  "version": "0.1.3",
+  "description": "Combine separately recorded recordings from a video conference into a single video file.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "example": "node lib/examples/simple.js",
+    "tsc": "tsc",
+    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dirvann/video-conference-stitcher.git"
+  },
+  "keywords": [
+    "rtp",
+    "webrtc",
+    "recording",
+    "nodejs",
+    "ffmpeg"
+  ],
+  "author": "Dirk Vanbeveren",
+  "contributors": [
+    {
+      "name": "Dirk Vanbeveren",
+      "email": "dirvann.dev@gmail.com",
+      "url": ""
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^3.9.7"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.7",
+    "@types/node": "^14.0.27",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-eslint-rules": "^5.4.0"
+  }
+}

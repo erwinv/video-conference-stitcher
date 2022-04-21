@@ -7,9 +7,9 @@ import {
   EncodingOptions,
   VideoLayout,
 } from '../index'
-const { PresenterLayout, GridLayout, MosaicLayout } = Layouts
+const { MosaicLayout } = Layouts
 
-function basicEncode(encode = true) {
+function basicEncode() {
   // GET LIST OF MEDIA PER USER
   const videoFolder = path.join(__dirname, '../../videos')
 

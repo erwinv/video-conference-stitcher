@@ -48,21 +48,22 @@ export default class Sequence {
     this.mediaList.push(video)
   }
 
-  encode(): Promise<any> {
+  async encode() {
     console.log('start encoding')
     return this.generateCommand().then(([filter, command]) => {
       return CommandExecutor.pipeExec(filter, command, true)
     })
   }
 
-  private createSequenceSteps(): Promise<any> {
+  private createSequenceSteps() {
     // check videos
     return this.mediaList
-      .reduce(
-        async (p: Promise<void>, med: Media) =>
-          p.then(() => (med.initialized ? Promise.resolve() : med.init())),
-        Promise.resolve()
-      )
+      .reduce(async (p: Promise<void>, med: Media) => {
+        await p
+        if (!med.initialized) {
+          await med.init()
+        }
+      }, Promise.resolve())
       .catch((err) => {
         console.log('error initializing video files', err)
         throw err

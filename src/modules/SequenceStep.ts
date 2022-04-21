@@ -52,11 +52,11 @@ export default class SequenceStep {
     )
 
     // --------------- TRIM/SCALE VIDEOS ----------------------- //
-    let lastBoxIndex = 0
+    // let lastBoxIndex = 0
 
     videoList.forEach((vid, ind) => {
       const box = boxes[ind]
-      lastBoxIndex = ind + 1
+      // lastBoxIndex = ind + 1
       // Trim video
       if (vid.hasVideo) {
         out.push(

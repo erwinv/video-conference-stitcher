@@ -22,8 +22,8 @@ export default class Sequence {
     })
 
     const defaultEncodingOptions: EncodingOptions = {
-      size: { w: 1920, h: 1080 },
-      bitrate: '1800k',
+      size: { w: 1280, h: 720 },
+      bitrate: '1024k',
     }
     if (encOpt && encOpt.crf && encOpt.bitrate)
       throw new Error('cannot use bitrate and crf simultaneously')
@@ -185,9 +185,9 @@ export default class Sequence {
 
     // https://developers.google.com/media/vp9/settings/vod#recommended_settings
     // 1080p@30
-    const quality = `-b:v 1800k -minrate 900k -maxrate 2610k`
+    // const quality = `-b:v 1800k -minrate 900k -maxrate 2610k`
     // 720p@30
-    // const quality = `-b:v 1024k -minrate 512k -maxrate 1485k`
+    const quality = `-b:v 1024k -minrate 512k -maxrate 1485k`
 
     command.push(
       `-c:a libopus -b:a 128k -c:v libvpx-vp9 ${quality} -map [aud] -map [vid] -r 30 -y "${this.outputVideo.path}"`

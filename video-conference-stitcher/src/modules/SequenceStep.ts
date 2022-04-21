@@ -23,6 +23,8 @@ export default class SequenceStep {
     this.duration = endTime - startTime
     this.size = size
     this.layout = layout
+
+    // TODO FIXME corner case: empty room
     if (mediaList.length === 0)
       throw new Error('At least one video must be added to the sequence')
   }
@@ -107,6 +109,11 @@ export default class SequenceStep {
 
       prevVideoId = vid.id
     })
+
+    // TODO FIXME corner case: empty room
+    // if (videoList.length === 0) {
+    //   out.push(`[${this.id}_bg][${this.id}_out_v];`)
+    // }
 
     // -----------   TRIM AUDIO  ---------------- //
     const audioList = this.mediaList.filter((media) => media.hasAudio)

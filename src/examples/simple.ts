@@ -36,17 +36,16 @@ function basicEncode() {
   // CREATE SEQUENCE SETTINGS
   const videoLayout: VideoLayout = new MosaicLayout()
   const outputMedia: Media = new Media(
-    path.join(videoFolder, 'basicOutput.mp4'),
+    path.join(videoFolder, 'basicOutput.webm'),
     -1,
     true,
     true
   )
   const encodingOptions: EncodingOptions = {
-    crf: 20,
     loglevel: 'verbose',
     size: {
-      w: 1280,
-      h: 720,
+      w: 1920,
+      h: 1080,
     },
   }
 

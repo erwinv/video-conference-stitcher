@@ -2,8 +2,8 @@ import {spawn} from 'child_process'
 import {Readable} from 'stream'
 
 export default {
-  execute(command:string, log:boolean=false):Promise<any> {
-    return new Promise<any>(function(resolve, reject){
+  execute(command:string, log:boolean=false):Promise<void> {
+    return new Promise<void>(function(resolve, reject){
 
       if(log)console.log(
           '\n----- COMMAND -----\n',
@@ -38,7 +38,7 @@ export default {
    * @param log
    */
   pipeExec(value:string, command:string, log:boolean=false) {
-    return new Promise<any>(function(resolve, reject){
+    return new Promise<void>(function(resolve, reject){
 
       // Pretty printing the command in the terminal
       if(log)console.log(

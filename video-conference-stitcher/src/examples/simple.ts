@@ -27,7 +27,7 @@ function basicEncode(encode:boolean=true) {
   ]
 
   // CREATE SEQUENCE SETTINGS
-  const videoLayout:VideoLayout = new PresenterLayout()
+  const videoLayout:VideoLayout = new MosaicLayout()
   const outputMedia: Media = new Media(path.join(videoFolder, 'basicOutput.mp4'), -1, true, true)
   const encodingOptions: EncodingOptions = {
     crf: 20,

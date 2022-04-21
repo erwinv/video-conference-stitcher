@@ -31,7 +31,7 @@ export default class Media {
 
     // TODO not looking for stream channels if doesn't contain audio.
     // Would it work with just audio files?
-    return new Promise((resolve, reject)  => {
+    return new Promise<void>((resolve, reject)  => {
       Promise.all([this.getEntry('format=duration'), this.hasAudio?this.getEntry('stream=channels'):'-1'])
           .then(([duration ,channels]) => {
             this.duration = Math.round(parseFloat(duration)*1000)

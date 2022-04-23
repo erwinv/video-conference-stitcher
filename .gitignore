@@ -4,6 +4,7 @@ dist/
 videos/
 build/
 test
+*.tsbuildinfo
 
 test2
 

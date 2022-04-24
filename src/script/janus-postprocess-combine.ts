@@ -44,6 +44,10 @@ async function main() {
 
   const users = await Promise.all(
     info.users.map(async (user) => {
+      const isScreenShare = (user.display ?? user.name).startsWith(
+        'presentation'
+      )
+
       const userMedia = await Promise.all(
         user.sessions.flatMap((session) => {
           return [session.audio, session.video].flatMap((mjrFilename) => {
@@ -51,7 +55,13 @@ async function main() {
             return [
               convertMjr(path.join(recordingsDir, mjrFilename)).then(
                 ({ path, meta }) =>
-                  new Media(path, meta.u / 1000, meta.t === 'v', meta.t === 'a')
+                  new Media(
+                    path,
+                    meta.u / 1000,
+                    meta.t === 'v',
+                    meta.t === 'a',
+                    isScreenShare
+                  )
               ),
             ]
           })

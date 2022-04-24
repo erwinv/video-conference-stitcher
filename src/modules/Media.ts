@@ -23,7 +23,8 @@ export default class Media {
     path: string,
     startTime: number,
     hasVideo: boolean,
-    hasAudio: boolean
+    hasAudio: boolean,
+    public isScreenShare = false
   ) {
     this.path = path
     if (!(hasAudio || hasVideo))

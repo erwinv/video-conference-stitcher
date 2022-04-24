@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { Media, User, Layouts, Sequence } from '../index'
-import { convertJanusMjr } from '../lib/command'
+import { convertMjr } from '../lib/mjr'
 const { MosaicLayout } = Layouts
 
 interface ConferenceInfo {
@@ -46,23 +46,15 @@ async function main() {
     info.users.map(async (user) => {
       const userMedia = await Promise.all(
         user.sessions.flatMap((session) => {
-          const media = [] as Promise<Media>[]
-          const offset = session.start_offset_microsecs / 1000
-          if (session.audio) {
-            media.push(
-              convertJanusMjr(path.join(recordingsDir, session.audio)).then(
-                (audioPath) => new Media(audioPath, offset, false, true)
-              )
-            )
-          }
-          if (session.video) {
-            media.push(
-              convertJanusMjr(path.join(recordingsDir, session.video)).then(
-                (videoPath) => new Media(videoPath, offset, true, false)
-              )
-            )
-          }
-          return media
+          return [session.audio, session.video].flatMap((mjrFilename) => {
+            if (!mjrFilename) return []
+            return [
+              convertMjr(path.join(recordingsDir, mjrFilename)).then(
+                ({ path, meta }) =>
+                  new Media(path, meta.u / 1000, meta.t === 'v', meta.t === 'a')
+              ),
+            ]
+          })
         })
       )
 

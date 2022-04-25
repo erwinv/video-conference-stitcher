@@ -45,9 +45,8 @@ async function main() {
 
   const users = await Promise.all(
     info.users.map(async (user) => {
-      const isScreenShare = (user.display ?? user.name).startsWith(
-        'presentation'
-      )
+      const username = user.display ?? user.name
+      const isScreenShare = username.startsWith('presentation')
 
       const userMedia = await Promise.all(
         user.sessions.flatMap((session) => {
@@ -69,7 +68,7 @@ async function main() {
         })
       )
 
-      return new User(user.id, userMedia, user.display)
+      return new User(user.id, userMedia, username.replace(/\p{Emoji}/gu, ''))
     })
   )
 

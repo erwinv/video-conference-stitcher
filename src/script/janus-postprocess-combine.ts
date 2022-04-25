@@ -41,6 +41,7 @@ async function main() {
   )
 
   const info = JSON.parse(await fs.readFile(infoPath, 'utf8')) as ConferenceInfo
+  const conferenceStart = info.start_time_microsecs
 
   const users = await Promise.all(
     info.users.map(async (user) => {
@@ -57,7 +58,7 @@ async function main() {
                 ({ path, meta }) =>
                   new Media(
                     path,
-                    meta.u / 1000,
+                    Math.round((meta.u - conferenceStart) / 1000),
                     meta.t === 'v',
                     meta.t === 'a',
                     isScreenShare
@@ -80,7 +81,7 @@ async function main() {
   const output = new Media(outputPath, 0, true, true)
   const layout = new MosaicLayout()
   const sequence = new Sequence(users, output, layout)
-  await sequence.encode()
+  await sequence.encode('360p')
 }
 
 main()

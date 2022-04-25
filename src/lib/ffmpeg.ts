@@ -2,26 +2,37 @@ import { spawn } from 'child_process'
 
 export async function ffmpegMux(
   inputPaths: string[],
-  complexFilterGraph: string,
-  outputOpts: string[],
-  outputPath: string
+  outputPath: string,
+  complexFilter: string,
+  videoOutputEncoding: string,
+  audioOutputEncoding: string,
+  outputStreams: string[],
+  outputOpts: string[]
 ) {
-  const args = [
-    ...inputPaths.map((path) => `-i ${path}`),
-    complexFilterGraph,
-    ...outputOpts,
-    outputPath,
-  ]
+  const ffmpeg = spawn(
+    'ffmpeg',
+    [
+      '-v info',
+      ...inputPaths.map((path) => `-i "${path}"`),
+      complexFilter,
+      videoOutputEncoding,
+      audioOutputEncoding,
+      ...outputStreams.map((stream) => `-map ${stream}`),
+      ...outputOpts,
+      '-y',
+      outputPath,
+    ],
+    {
+      shell: true,
+      stdio: ['ignore', 'inherit', 'inherit'],
+    }
+  )
 
-  const ffmpeg = spawn('ffmpeg', args, {
-    stdio: ['ignore', 'inherit', 'inherit'],
-  })
-
-  return new Promise<number>((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     ffmpeg.on('error', reject)
     ffmpeg.on('close', (code) => {
-      if (code !== 0) reject(code)
-      else resolve(code)
+      if (code !== 0) reject(new Error(`Exit code: ${code}`))
+      else resolve()
     })
   })
 }

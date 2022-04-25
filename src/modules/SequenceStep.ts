@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import Media from './Media'
 import { Size, VideoLayout, VideoBox } from '../types/Types'
 
@@ -29,18 +30,31 @@ export default class SequenceStep {
       throw new Error('At least one video must be added to the sequence')
   }
 
-  generateFilter(): string {
+  generateFilter() {
+    const mostRecentPresentation = _.chain(this.mediaList)
+      .filter((media) => media.isPresentation)
+      .sortBy((vid) => vid.startTime)
+      .last()
+      .value()
+
     // All generated videos. Audio without linked video and video files
-    const videoList = this.mediaList.filter(
-      (media) =>
-        media.hasVideo ||
-        (media.hasAudio &&
-          !media.hasVideo &&
-          !this.mediaList.some(
-            (other) =>
-              other.hasVideo && media.user && other.user?.id === media.user?.id
-          ))
-    )
+    const videoList = mostRecentPresentation
+      ? [mostRecentPresentation]
+      : this.mediaList.filter(
+          (media) =>
+            media.hasVideo ||
+            (media.hasAudio &&
+              !media.hasVideo &&
+              !this.mediaList.some(
+                (other) =>
+                  other.hasVideo &&
+                  media.user &&
+                  other.user?.id === media.user?.id
+              ))
+        )
+    if (videoList.length > 9) {
+      videoList.splice(9)
+    }
 
     // TODO I assume videos are sorted by their id small to big
     const boxes: VideoBox[] = this.layout.getBoxes(videoList.length, this.size)
@@ -158,6 +172,6 @@ export default class SequenceStep {
       )
     }
 
-    return out.join('')
+    return out
   }
 }

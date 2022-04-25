@@ -3,23 +3,6 @@ export interface Size {
   h: number
 }
 
-export interface EncodingOptions {
-  crf?: number
-  bitrate?: string
-  size: Size
-  loglevel?:
-    | number
-    | 'quiet'
-    | 'panic'
-    | 'fatal'
-    | 'error'
-    | 'warning'
-    | 'info'
-    | 'verbose'
-    | 'debug'
-    | 'trace'
-}
-
 export interface VideoBox {
   w: number
   h: number

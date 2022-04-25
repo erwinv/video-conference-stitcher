@@ -1,15 +1,8 @@
 import path from 'path'
-import {
-  User,
-  Layouts,
-  Sequence,
-  Media,
-  EncodingOptions,
-  VideoLayout,
-} from '../index'
+import { User, Layouts, Sequence, Media, VideoLayout } from '../index'
 const { MosaicLayout } = Layouts
 
-function basicEncode() {
+async function basicEncode() {
   // GET LIST OF MEDIA PER USER
   const videoFolder = path.join(__dirname, '../../videos')
 
@@ -41,26 +34,12 @@ function basicEncode() {
     true,
     true
   )
-  const encodingOptions: EncodingOptions = {
-    loglevel: 'verbose',
-    size: {
-      w: 1920,
-      h: 1080,
-    },
-  }
 
   // CREATE A SEQUENCE WITH GIVEN SETTINGS
-  const sequence: Sequence = new Sequence(
-    users,
-    outputMedia,
-    videoLayout,
-    encodingOptions
-  )
+  const sequence: Sequence = new Sequence(users, outputMedia, videoLayout)
 
   // ENCODE THE SEQUENCE
-  sequence.encode().then((comm) => {
-    console.log(comm)
-  })
+  await sequence.encode('360p')
 }
 
 basicEncode()

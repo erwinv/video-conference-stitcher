@@ -24,7 +24,7 @@ export default class Media {
     startTime: number,
     hasVideo: boolean,
     hasAudio: boolean,
-    public isScreenShare = false
+    public isPresentation = false
   ) {
     this.path = path
     if (!(hasAudio || hasVideo))
@@ -68,16 +68,16 @@ export default class Media {
       })
 
       ls.stderr.on('data', (data) => {
-        if (log) console.log(`stderr: ${data}`)
-        reject(data)
+        if (log) console.error(data)
       })
 
       ls.on('error', (error) => {
-        if (log) console.log(`error: ${error.message}`)
+        if (log) console.error(`error: ${error.message}`)
         reject(error)
       })
 
       ls.on('close', (code) => {
+        if (code !== 0) reject()
         if (log) console.log(`child process exited with code ${code}`)
       })
     })

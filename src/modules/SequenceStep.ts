@@ -86,7 +86,7 @@ export default class SequenceStep {
             this.duration / 1000
           },drawtext=text='${
             vid.user?.name
-          }':x=(w-tw)/2:y=((h-th)/2):fontcolor=black:fontsize=55,`
+          }':x=(w-tw)/2:y=((h-th)/2):fontfile=/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf:fontcolor=black:fontsize=55,`
         )
       }
       // scale fit in box

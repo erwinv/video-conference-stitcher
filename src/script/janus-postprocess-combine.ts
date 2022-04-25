@@ -81,7 +81,7 @@ async function main() {
   const output = new Media(outputPath, 0, true, true)
   const layout = new MosaicLayout()
   const sequence = new Sequence(users, output, layout)
-  await sequence.encode('360p')
+  await sequence.encode('720p')
 }
 
 main()

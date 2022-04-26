@@ -1,4 +1,4 @@
-import { spawn } from 'child_process'
+import { ffprobe } from '../lib/ffmpeg'
 import User from './User'
 
 export default class Media {
@@ -34,53 +34,17 @@ export default class Media {
     this.startTime = startTime
   }
 
-  init() {
+  async init() {
     // TODO not looking for stream channels if doesn't contain audio.
     // Would it work with just audio files?
-    return new Promise<void>((resolve, reject) => {
-      Promise.all([
-        this.getEntry('format=duration'),
-        this.hasAudio ? this.getEntry('stream=channels') : '-1',
-      ])
-        .then(([duration, channels]) => {
-          this.duration = Math.round(parseFloat(duration) * 1000)
-          this.audioChannels = parseInt(channels, 10)
-          this.initialized = true
-          resolve()
-        })
-        .catch((err) => {
-          console.error('error loading video file at ', this.path, err)
-          reject(err)
-        })
-    })
-  }
+    const [duration, channels] = await Promise.all([
+      ffprobe(this.path, 'format=duration'),
+      this.hasAudio ? ffprobe(this.path, 'stream=channels') : '-1',
+    ])
 
-  /**
-   * @return time in milliseconds
-   */
-  async getEntry(entry: string, log = false): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const command = `ffprobe -v error -show_entries ${entry} -of default=noprint_wrappers=1:nokey=1 "${this.path}"`
-      const ls = spawn(command, [], { shell: true })
-      ls.stdout.on('data', (data) => {
-        if (log) console.log(`stdout: ${data}`)
-        resolve(data)
-      })
-
-      ls.stderr.on('data', (data) => {
-        if (log) console.error(data)
-      })
-
-      ls.on('error', (error) => {
-        if (log) console.error(`error: ${error.message}`)
-        reject(error)
-      })
-
-      ls.on('close', (code) => {
-        if (code !== 0) reject()
-        if (log) console.log(`child process exited with code ${code}`)
-      })
-    })
+    this.duration = Math.round(parseFloat(duration) * 1000)
+    this.audioChannels = parseInt(channels, 10)
+    this.initialized = true
   }
 
   setId(id: number): void {

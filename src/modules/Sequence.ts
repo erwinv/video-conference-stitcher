@@ -32,30 +32,32 @@ export default class Sequence {
     switch (resolution) {
       case '360p':
         dimensions = { w: 640, h: 360 }
-        videoEncodingOpts = '-b:v 276k -minrate 138k -maxrate 400k'
+        videoEncodingOpts =
+          '-b:v 276k -minrate 138k -maxrate 400k -tile-columns 1 -g 240 -threads 4 -quality good -crf 36'
         break
       default:
       case '720p':
         dimensions = { w: 1280, h: 720 }
-        videoEncodingOpts = '-b:v 1024k -minrate 512k -maxrate 1485k'
+        videoEncodingOpts =
+          '-b:v 1024k -minrate 512k -maxrate 1485k -tile-columns 2 -g 240 -threads 8 -quality good -crf 32'
         break
       case '1080p':
         dimensions = { w: 1920, h: 1080 }
-        videoEncodingOpts = '-b:v 1800k -minrate 900k -maxrate 2610k'
+        videoEncodingOpts =
+          '-b:v 1800k -minrate 900k -maxrate 2610k -tile-columns 3 -g 240 -threads 8 -quality good -crf 32'
         break
     }
 
     await this.createSequenceSteps(dimensions)
     const [complexFilter, outputStreams] = this.generateComplexFilter()
 
-    return ffmpegMux(
+    await ffmpegMux(
       this.mediaList.map((media) => media.path),
       this.outputVideo.path,
       complexFilter,
-      `-c:v libvpx-vp9 ${videoEncodingOpts}`,
-      `-c:a libopus -b:a 128k`,
-      outputStreams,
-      ['-r 30']
+      `${videoEncodingOpts} -c:v libvpx-vp9`,
+      '-b:a 128k -c:a libopus',
+      outputStreams
     )
   }
 

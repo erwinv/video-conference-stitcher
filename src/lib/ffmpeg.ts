@@ -6,8 +6,7 @@ export async function ffmpegMux(
   complexFilter: string,
   videoOutputEncoding: string,
   audioOutputEncoding: string,
-  outputStreams: string[],
-  outputOpts: string[]
+  outputStreams: string[]
 ) {
   const ffmpeg = spawn(
     'ffmpeg',
@@ -18,7 +17,6 @@ export async function ffmpegMux(
       videoOutputEncoding,
       audioOutputEncoding,
       ...outputStreams.map((stream) => `-map ${stream}`),
-      ...outputOpts,
       '-y',
       outputPath,
     ],
@@ -33,6 +31,27 @@ export async function ffmpegMux(
     ffmpeg.on('close', (code) => {
       if (code !== 0) reject(new Error(`Exit code: ${code}`))
       else resolve()
+    })
+  })
+}
+
+export async function ffprobe(path: string, entry: string) {
+  const ffprobe = spawn(
+    'ffprobe',
+    [
+      '-v error',
+      `-show_entries ${entry}`,
+      '-of default=noprint_wrappers=1:nokey=1',
+      `"${path}"`,
+    ],
+    { shell: true, stdio: ['ignore', 'pipe', 'inherit'] }
+  )
+
+  return new Promise<string>((resolve, reject) => {
+    ffprobe.stdout.on('data', resolve)
+    ffprobe.on('error', reject)
+    ffprobe.on('close', (code) => {
+      if (code !== 0) reject()
     })
   })
 }

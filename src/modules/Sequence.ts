@@ -44,7 +44,7 @@ export default class Sequence {
       case '1080p':
         dimensions = { w: 1920, h: 1080 }
         videoEncodingOpts =
-          '-b:v 1800k -minrate 900k -maxrate 2610k -tile-columns 3 -g 240 -threads 8 -quality good -crf 32'
+          '-b:v 1800k -minrate 900k -maxrate 2610k -tile-columns 2 -g 240 -threads 8 -quality good -crf 31'
         break
     }
 

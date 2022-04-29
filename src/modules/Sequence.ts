@@ -68,10 +68,8 @@ export default class Sequence {
     }
 
     this.mediaList
-      .sort((a, b) =>
-        a.startTime > b.startTime ? 1 : a.startTime === b.startTime ? 0 : -1
-      )
-      .forEach((vid, index) => vid.setId(index))
+      .sort((a, b) => a.startTime - b.startTime)
+      .forEach((media, index) => media.setId(index))
 
     interface MediaPoint {
       start_point: boolean
@@ -102,18 +100,18 @@ export default class Sequence {
     // building sequences
 
     let prevTime = -1
-    const currentVideos: Media[] = []
+    const currentMediaList: Media[] = []
     this.sequenceSteps = []
     while (queue.length > 0) {
       const point = queue.pop() as MediaPoint
       if (
         (queue.length === 0 || point.time !== prevTime) &&
         prevTime !== -1 &&
-        currentVideos.length >= 0
+        currentMediaList.length >= 0
       ) {
         const step: SequenceStep = new SequenceStep(
           `Seq${this.sequenceSteps.length}`,
-          [...currentVideos],
+          [...currentMediaList],
           prevTime,
           point.time,
           outputDimensions,
@@ -122,12 +120,12 @@ export default class Sequence {
         this.sequenceSteps.push(step)
       }
       if (point.start_point) {
-        currentVideos.push(this.mediaList[point.media_id])
+        currentMediaList.push(this.mediaList[point.media_id])
       } else {
-        const index: number = currentVideos.findIndex(
+        const index: number = currentMediaList.findIndex(
           (vid) => vid.id === point.media_id
         )
-        currentVideos.splice(index, 1)
+        currentMediaList.splice(index, 1)
       }
       prevTime = point.time
     }

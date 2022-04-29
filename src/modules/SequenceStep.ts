@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import Media from './Media'
 import { Size, VideoLayout, VideoBox } from '../types/Types'
+import { User } from '..'
 
 export default class SequenceStep {
   public readonly id: string
@@ -24,10 +25,6 @@ export default class SequenceStep {
     this.duration = endTime - startTime
     this.size = size
     this.layout = layout
-
-    // TODO FIXME corner case: empty room
-    if (mediaList.length === 0)
-      throw new Error('At least one video must be added to the sequence')
   }
 
   generateFilter() {
@@ -54,6 +51,10 @@ export default class SequenceStep {
         )
     if (videoList.length > 9) {
       videoList.splice(9)
+    } else if (videoList.length === 0) {
+      const noMedia = new Media('', 0, false, true)
+      noMedia.user = new User(0, [], 'no media')
+      videoList.push(noMedia)
     }
 
     // TODO I assume videos are sorted by their id small to big
@@ -61,31 +62,29 @@ export default class SequenceStep {
     // if(this.getDuration() < 30) return `nullsrc=s=${this.size.w}x${this.size.h}:d=${this.getDuration()/1000}[${this.id}_out_v];anullsrc,atrim=0:${this.getDuration()/1000}[${this.id}_out_a];`
 
     const out: string[] = []
-    out.push(
-      `color=s=${this.size.w}x${this.size.h},trim=0:${this.duration / 1000}[${
-        this.id
-      }_bg];`
-    )
+
+    const bg = `color=s=${this.size.w}x${this.size.h},trim=0:${
+      this.duration / 1000
+    }[${this.id}_bg];`
+
+    out.push(bg)
 
     // --------------- TRIM/SCALE VIDEOS ----------------------- //
-    // let lastBoxIndex = 0
-
     videoList.forEach((vid, ind) => {
       const box = boxes[ind]
-      // lastBoxIndex = ind + 1
       // Trim video
       if (vid.hasVideo) {
-        out.push(
-          `[${vid.id}:v]trim=${(this.startTime - vid.startTime) / 1000}:${
-            (this.duration + this.startTime - vid.startTime) / 1000
-          },setpts=PTS-STARTPTS,`
-        )
+        const startOffset = (this.startTime - vid.startTime) / 1000
+        const endOffset =
+          (this.duration + this.startTime - vid.startTime) / 1000
+        const trimmedVid = `[${vid.id}:v]trim=${startOffset}:${endOffset},setpts=PTS-STARTPTS,`
+        out.push(trimmedVid)
       } else {
         out.push(
           `color=s=${this.size.w}x${this.size.h}:c=green@1.0,trim=0:${
             this.duration / 1000
           },drawtext=text='${
-            vid.user?.name
+            vid.user?.name ?? ''
           }':x=(w-tw)/2:y=((h-th)/2):fontfile=/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf:fontcolor=black:fontsize=55,`
         )
       }
@@ -124,40 +123,35 @@ export default class SequenceStep {
       prevVideoId = vid.id
     })
 
-    // TODO FIXME corner case: empty room
-    // if (videoList.length === 0) {
-    //   out.push(`[${this.id}_bg][${this.id}_out_v];`)
-    // }
-
     // -----------   TRIM AUDIO  ---------------- //
     const audioList = this.mediaList.filter((media) => media.hasAudio)
-    audioList.forEach((vid) => {
+    audioList.forEach((aud) => {
+      const startOffset = (this.startTime - aud.startTime) / 1000
+      const endOffset = (this.duration + this.startTime - aud.startTime) / 1000
       out.push(
-        `[${vid.id}:a]atrim=${(this.startTime - vid.startTime) / 1000}:${
-          (this.duration + this.startTime - vid.startTime) / 1000
-        },asetpts=PTS-STARTPTS[${this.id}_${vid.id}_a];`
+        `[${aud.id}:a]atrim=${startOffset}:${endOffset},asetpts=PTS-STARTPTS[${this.id}_${aud.id}_a];`
       )
     })
 
     // -----------  MIX AUDIO ------------ //
 
     const inputList = audioList
-      .map((vid) => `[${this.id}_${vid.id}_a]`)
+      .map((aud) => `[${this.id}_${aud.id}_a]`)
       .join('')
 
     let c0 = ''
     let c1 = ''
     let currentIndex = 0
-    audioList.forEach((vid, ind) => {
+    audioList.forEach((aud, ind) => {
       const plus: string = ind === audioList.length - 1 ? '' : '+'
-      if (vid.audioChannels === 6) {
+      if (aud.audioChannels === 6) {
         c0 += `0.4*c${currentIndex}+0.6*c${currentIndex + 2}${plus}`
         c1 += `0.4*c${currentIndex + 1}+0.6*c${currentIndex + 2}${plus}`
       } else {
         c0 += `c${currentIndex}${plus}`
         c1 += `c${currentIndex + 1}${plus}`
       }
-      currentIndex += vid.audioChannels
+      currentIndex += aud.audioChannels
     })
     if (audioList.length > 0) {
       out.push(

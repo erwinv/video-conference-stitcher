@@ -184,9 +184,6 @@ export default class Sequence {
       sequenceOutput,
     ].join('')
 
-    return [
-      `-filter_complex "${complexFilterGraph}"`,
-      [videoOut, audioOut] as string[],
-    ] as const
+    return [complexFilterGraph, [videoOut, audioOut] as string[]] as const
   }
 }

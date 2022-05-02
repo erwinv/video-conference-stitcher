@@ -8,23 +8,21 @@ export async function ffmpegMux(
   audioOutputEncoding: string,
   outputStreams: string[]
 ) {
-  const ffmpeg = spawn(
-    'ffmpeg',
-    [
-      '-v info',
-      ...inputPaths.map((path) => `-i "${path}"`),
-      complexFilter,
-      videoOutputEncoding,
-      audioOutputEncoding,
-      ...outputStreams.map((stream) => `-map ${stream}`),
-      '-y',
-      outputPath,
-    ],
-    {
-      shell: true,
-      stdio: ['ignore', 'inherit', 'inherit'],
-    }
-  )
+  const args = [
+    '-v info',
+    ...inputPaths.map((path) => `-i "${path}"`),
+    `-filter_complex "${complexFilter}"`,
+    videoOutputEncoding,
+    audioOutputEncoding,
+    ...outputStreams.map((stream) => `-map ${stream}`),
+    '-y',
+    outputPath,
+  ]
+
+  const ffmpeg = spawn('ffmpeg', {
+    shell: true,
+    stdio: ['pipe', 'inherit', 'inherit'],
+  })
 
   return new Promise<void>((resolve, reject) => {
     ffmpeg.on('error', reject)
@@ -32,6 +30,11 @@ export async function ffmpegMux(
       if (code !== 0) reject(new Error(`Exit code: ${code}`))
       else resolve()
     })
+
+    for (const arg of args) {
+      ffmpeg.stdin.write(arg)
+    }
+    ffmpeg.stdin.end()
   })
 }
 

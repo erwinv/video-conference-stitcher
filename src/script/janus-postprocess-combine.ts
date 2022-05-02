@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import fs from 'fs/promises'
 import path from 'path'
 import { Media, User, Layouts, Sequence } from '../index'
@@ -53,24 +54,27 @@ async function main() {
           return [session.audio, session.video].flatMap((mjrFilename) => {
             if (!mjrFilename) return []
             return [
-              convertMjr(path.join(recordingsDir, mjrFilename)).then(
-                ({ path, meta }) =>
-                  new Media(
-                    path,
-                    Math.round((meta.u - conferenceStart) / 1000),
-                    meta.t === 'v',
-                    meta.t === 'a',
-                    isScreenShare
-                  )
-              ),
+              convertMjr(path.join(recordingsDir, mjrFilename))
+                .then(
+                  ({ path, meta }) =>
+                    new Media(
+                      path,
+                      Math.round((meta.u - conferenceStart) / 1000),
+                      meta.t === 'v',
+                      meta.t === 'a',
+                      isScreenShare
+                    )
+                )
+                .catch(() => null),
             ]
           })
         })
       )
 
+      const isMedia = (m: Media | null): m is Media => !_.isNil(m)
       return new User(
         user.id,
-        userMedia,
+        userMedia.filter(isMedia),
         username.replace(/\p{Emoji}/gu, '').trim()
       )
     })

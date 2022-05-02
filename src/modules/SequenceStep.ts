@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import Media from './Media'
 import { Size, VideoLayout, VideoBox } from '../types/Types'
-import { User } from '..'
 
 export default class SequenceStep {
   public readonly id: string

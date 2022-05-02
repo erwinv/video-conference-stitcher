@@ -68,7 +68,11 @@ async function main() {
         })
       )
 
-      return new User(user.id, userMedia, username.replace(/\p{Emoji}/gu, ''))
+      return new User(
+        user.id,
+        userMedia,
+        username.replace(/\p{Emoji}/gu, '').trim()
+      )
     })
   )
 

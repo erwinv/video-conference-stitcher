@@ -51,10 +51,6 @@ export default class SequenceStep {
         )
     if (videoList.length > 9) {
       videoList.splice(9)
-    } else if (videoList.length === 0) {
-      const noMedia = new Media('', 0, false, true)
-      noMedia.user = new User(0, [], 'no media')
-      videoList.push(noMedia)
     }
 
     // TODO I assume videos are sorted by their id small to big
@@ -65,9 +61,13 @@ export default class SequenceStep {
 
     const bg = `color=s=${this.size.w}x${this.size.h},trim=0:${
       this.duration / 1000
-    }[${this.id}_bg];`
+    }`
 
-    out.push(bg)
+    if (videoList.length === 0) {
+      out.push(`${bg}[${this.id}_out_v];`)
+    } else {
+      out.push(`${bg}[${this.id}_bg];`)
+    }
 
     // --------------- TRIM/SCALE VIDEOS ----------------------- //
     videoList.forEach((vid, ind) => {

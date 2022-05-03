@@ -1,8 +1,5 @@
-import cuid from 'cuid'
 import { spawn } from 'child_process'
-import { writeFile, unlink } from 'fs/promises'
-import { tmpdir } from 'os'
-import { join } from 'path'
+import { Readable } from 'stream'
 
 export async function ffmpegMux(
   inputPaths: string[],
@@ -12,15 +9,12 @@ export async function ffmpegMux(
   audioOutputEncoding: string,
   outputStreams: string[]
 ) {
-  const filterScript = join(tmpdir(), cuid())
-  await writeFile(filterScript, complexFilter)
-
   const ffmpeg = spawn(
     'ffmpeg',
     [
       '-v info',
       ...inputPaths.map((path) => `-i "${path}"`),
-      `-filter_complex_script ${filterScript}`,
+      `-filter_complex_script pipe:`,
       videoOutputEncoding,
       audioOutputEncoding,
       ...outputStreams.map((stream) => `-map ${stream}`),
@@ -29,21 +23,19 @@ export async function ffmpegMux(
     ],
     {
       shell: true,
-      stdio: ['ignore', 'inherit', 'inherit'],
+      stdio: ['pipe', 'inherit', 'inherit'],
     }
   )
 
-  try {
-    await new Promise<void>((resolve, reject) => {
-      ffmpeg.on('error', reject)
-      ffmpeg.on('close', (code) => {
-        if (code !== 0) reject(new Error(`Exit code: ${code}`))
-        else resolve()
-      })
+  await new Promise<void>((resolve, reject) => {
+    ffmpeg.on('error', reject)
+    ffmpeg.on('close', (code) => {
+      if (code !== 0) reject(new Error(`Exit code: ${code}`))
+      else resolve()
     })
-  } finally {
-    await unlink(filterScript)
-  }
+
+    Readable.from(complexFilter).pipe(ffmpeg.stdin)
+  })
 }
 
 export async function ffprobe(path: string, entry: string) {
